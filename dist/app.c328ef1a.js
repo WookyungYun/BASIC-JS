@@ -136,15 +136,15 @@ window.addEventListener("hashchange", function () {
   title.innerHTML = newsContents.title;
   content.appendChild(title);
   console.log(newsContents);
+  //div안에 h1태그로 title활용
 });
+
 for (var i = 0; i < 10; i++) {
-  var li = document.createElement("li");
-  var a = document.createElement("a");
-  a.href = "#".concat(newsFeed[i].id);
-  a.innerHTML = "".concat(newsFeed[i].title, " (").concat(newsFeed[i].comments_count, ")");
-  li.appendChild(a);
-  ul.appendChild(li);
+  var div = document.createElement("div");
+  div.innerHTML = "\n  <li>\n    <a href=\"#".concat(newsFeed[i].id, "\">\n      ").concat(newsFeed[i].title, " (").concat(newsFeed[i].comments_count, ")\n    </a>\n  </li>\n  ");
+  ul.appendChild(div.firstElementChild); //div의 자식요소인 li를 가져오기 위해 사용
 }
+
 container.appendChild(ul);
 container.appendChild(content);
 },{}],"../../../AppData/Local/Yarn/Data/global/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
@@ -172,7 +172,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "57201" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "50601" + '/');
   ws.onmessage = function (event) {
     checkedAssets = {};
     assetsToAccept = [];

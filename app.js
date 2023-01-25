@@ -21,17 +21,21 @@ window.addEventListener("hashchange", function () {
   title.innerHTML = newsContents.title;
   content.appendChild(title);
   console.log(newsContents);
+  //div안에 h1태그로 title활용
 });
 
 for (let i = 0; i < 10; i++) {
-  const li = document.createElement("li");
-  const a = document.createElement("a");
+  const div = document.createElement("div");
 
-  a.href = `#${newsFeed[i].id}`;
-  a.innerHTML = `${newsFeed[i].title} (${newsFeed[i].comments_count})`;
+  div.innerHTML = `
+  <li>
+    <a href="#${newsFeed[i].id}">
+      ${newsFeed[i].title} (${newsFeed[i].comments_count})
+    </a>
+  </li>
+  `;
 
-  li.appendChild(a);
-  ul.appendChild(li);
+  ul.appendChild(div.firstElementChild); //div의 자식요소인 li를 가져오기 위해 사용
 }
 
 container.appendChild(ul);
