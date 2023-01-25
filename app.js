@@ -11,33 +11,48 @@ function getData(url) {
   return JSON.parse(ajax.response);
 }
 
-const newsFeed = getData(NEWS_URL);
-const ul = document.createElement("ul");
+function newsFeed() {
+  const newsFeed = getData(NEWS_URL);
+  const newsList = [];
 
-window.addEventListener("hashchange", function () {
-  const id = location.hash.substr(1);
+  newsList.push("<ul>");
 
-  const newsContents = getData(CONTENT_URL.replace("@id", id));
-  const title = document.createElement("h1");
-  title.innerHTML = newsContents.title;
-  content.appendChild(title);
-  console.log(newsContents);
-  //div안에 h1태그로 title활용
-});
-
-for (let i = 0; i < 10; i++) {
-  const div = document.createElement("div");
-
-  div.innerHTML = `
+  for (let i = 0; i < 10; i++) {
+    newsList.push(`
   <li>
     <a href="#${newsFeed[i].id}">
       ${newsFeed[i].title} (${newsFeed[i].comments_count})
     </a>
   </li>
-  `;
+  `);
+  }
+  newsList.push("</ul>");
 
-  ul.appendChild(div.firstElementChild); //div의 자식요소인 li를 가져오기 위해 사용
+  container.innerHTML = newsList.join("");
 }
 
-container.appendChild(ul);
-container.appendChild(content);
+function newsDetail() {
+  const id = location.hash.substr(1);
+
+  const newsContents = getData(CONTENT_URL.replace("@id", id));
+
+  container.innerHTML = `
+    <h1>${newsContents.title}</h1>
+
+    <div>
+      <a href="#">목록으로</a>
+    </div>
+  `;
+}
+
+function router() {
+  const routePath = location.hash;
+  if (routePath === "") {
+    newsFeed();
+  } else {
+    newsDetail();
+  }
+}
+window.addEventListener("hashchange", router);
+
+router();
