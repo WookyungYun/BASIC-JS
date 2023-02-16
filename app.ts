@@ -34,11 +34,33 @@ const store: Store = {
   feeds: [],
 };
 
-function getData<AjaxResponse>(url: string): AjaxResponse {
-  ajax.open("GET", url, false);
-  ajax.send();
+class Api {
+  url: string;
+  ajax: XMLHttpRequest;
 
-  return JSON.parse(ajax.response);
+  constructor(url: string) {
+    this.url = url;
+    this.ajax = new XMLHttpRequest();
+  }
+
+  protected getRequest<AjaxResponse>(): AjaxResponse {
+    this.ajax.open("GET", this.url, false);
+    this.ajax.send();
+
+    return JSON.parse(this.ajax.response);
+  }
+}
+
+class NewsFeedApi extends Api {
+  getData(): NewsFeed[] {
+    return this.getRequest<NewsFeed[]>();
+  }
+}
+
+class NewsDetailApi extends Api {
+  getData(): NewsDetail {
+    return this.getRequest<NewsDetail>();
+  }
 }
 
 function makeFeeds(feeds: NewsFeed[]): NewsFeed[] {
@@ -58,6 +80,7 @@ function updateView(html: string): void {
 }
 
 function newsFeed(): void {
+  const api = new NewsFeedApi(NEWS_URL);
   let newsFeed: NewsFeed[] = store.feeds;
   const newsList = [];
   let template = `
@@ -86,7 +109,7 @@ function newsFeed(): void {
   `;
 
   if (newsFeed.length === 0) {
-    newsFeed = store.feeds = makeFeeds(getData<NewsFeed[]>(NEWS_URL));
+    newsFeed = store.feeds = makeFeeds(api.getData());
   }
 
   for (let i = (store.currentPage - 1) * 10; i < store.currentPage * 10; i++) {
@@ -129,8 +152,8 @@ function newsFeed(): void {
 
 function newsDetail(): void {
   const id = location.hash.substring(7);
-
-  const newsContents = getData<NewsDetail>(CONTENT_URL.replace("@id", id));
+  const api = new NewsDetailApi(CONTENT_URL.replace("@id", id));
+  const newsContent = api.getData();
   let template = `
   <div class="bg-gray-600 min-h-screen pb-8">
     <div class="bg-white text-xl">
@@ -149,9 +172,9 @@ function newsDetail(): void {
     </div>
 
     <div class="h-full border rounded-xl bg-white m-6 p-4 ">
-      <h2>${newsContents.title}</h2>
+      <h2>${newsContent.title}</h2>
       <div class="text-gray-400 h-20">
-        ${newsContents.content}
+        ${newsContent.content}
       </div>
 
       {{__comments__}}
@@ -168,7 +191,7 @@ function newsDetail(): void {
   }
 
   updateView(
-    template.replace("{{__comments__}}", makeComment(newsContents.comments))
+    template.replace("{{__comments__}}", makeComment(newsContent.comments))
   );
 }
 
